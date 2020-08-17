@@ -1,0 +1,39 @@
+{
+  "name": "oath-parser",
+  "version": "1.0.0",
+  "description": "A parser to reverse-engineer Oath Board Game TTS savefiles.",
+  "main": "./dist/index.js",
+  "typings": "./dist/src/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "webpack --config webpack.config.js",
+    "test": "ava-ts src/**/*.spec.ts",
+    "test:savefile": "ts-node test/savefile.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seiyria/OathParser.git"
+  },
+  "keywords": [
+    "oath",
+    "boardgame",
+    "savefile",
+    "tts",
+    "tabletopsim",
+    "parser"
+  ],
+  "author": "Kyle Kemp <kyle@seiyria.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seiyria/OathParser/issues"
+  },
+  "homepage": "https://github.com/seiyria/OathParser#readme",
+  "devDependencies": {
+    "@types/node": "^9.4.6",
+    "ava-ts": "^0.24.2",
+    "awesome-typescript-loader": "^3.4.1",
+    "ts-node": "^4.1.0",
+    "typescript": "^2.7.2",
+    "webpack": "^3.11.0"
+  }
+}

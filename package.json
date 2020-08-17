@@ -4,6 +4,7 @@
   "description": "A parser to reverse-engineer Oath Board Game TTS savefiles.",
   "main": "./dist/index.js",
   "typings": "./dist/src/index.d.ts",
+  "registry": "npm",
   "scripts": {
     "prepare": "npm run build",
     "build": "webpack --config webpack.config.js",

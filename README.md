@@ -22,3 +22,8 @@ The Lua code is kept in `lua/`. It's copy/pasted out of the TTS mod for easier r
 ## Future
 
 Serialize a savefile string by passing in a JSON object.
+
+## Credits
+
+- Cole & Leder Games: making this great game (& letting me make cool stuff)
+- AgentElron: having such readable code!

@@ -1,5 +1,5 @@
 {
-  "name": "oath-parser",
+  "name": "@seiyria/oath-parser",
   "version": "1.0.0",
   "description": "A parser to reverse-engineer Oath Board Game TTS savefiles.",
   "main": "./dist/index.js",

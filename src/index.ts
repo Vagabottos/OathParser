@@ -206,7 +206,7 @@ export function parseOathTTSSavefileString(saveDataString: string): OathGame {
       });
 
       return { 
-        name: siteData >= 24 ? SiteNameIndexes[siteData - 23] : SiteNameIndexes[siteData], 
+        name: SiteNameIndexes[siteData], 
         ruined: siteData >= 24,
         cards
       };

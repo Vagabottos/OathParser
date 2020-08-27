@@ -241,7 +241,7 @@ export const CardName = {
   'Skeleton Key': 230,
   'Oracular Pig': 231,
   'Circlet of Command': 232,
-  'Proof of Nobility': 233,
+  'Ivory Eye': 233,
   'Map': 234,
   'Obsidian Cage': 235,
   'Book of Records': 236,

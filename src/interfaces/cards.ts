@@ -237,7 +237,7 @@ export const CardName = {
   'Dowsing Sticks': 226,
   'Cracked Horn': 227,
   'Bandit Crown': 228,
-  'Banner of Devotion': 229,
+  'Ring of Devotion': 229,
   'Skeleton Key': 230,
   'Oracular Pig': 231,
   'Circlet of Command': 232,

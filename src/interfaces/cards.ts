@@ -97,7 +97,7 @@ export const CardName = {
   'Relic Thief': 94,
   'Enchantress': 95,
   'Insomnia': 96,
-  'Surprise Attack': 97,
+  'Sneak Attack': 97,
   'Gossip': 98,
   'Bandit Chief': 99,
   'Cult of Chaos': 100,

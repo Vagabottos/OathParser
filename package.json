@@ -1,6 +1,6 @@
 {
   "name": "@seiyria/oath-parser",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A parser to reverse-engineer Oath Board Game TTS savefiles.",
   "main": "./dist/index.js",
   "typings": "./dist/src/index.d.ts",
@@ -34,7 +34,7 @@
     "ava-ts": "^0.24.2",
     "awesome-typescript-loader": "^3.4.1",
     "ts-node": "^4.1.0",
-    "typescript": "^2.7.2",
+    "typescript": "^3.5.1",
     "webpack": "^3.11.0"
   }
 }

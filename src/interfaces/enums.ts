@@ -21,7 +21,9 @@ export enum PlayerColor {
   Yellow = 'Yellow',
   White = 'White',
   Blue = 'Blue',
-  Red = 'Red'
+  Red = 'Red',
+
+  Unknown = '???'
 }
 
 export enum Citizenship {

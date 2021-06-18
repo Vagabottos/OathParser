@@ -29,7 +29,9 @@ enum SavefileDataType {
   Site8,
   WorldDeckSize,
   DispossessedDeckSize,
-  RelicDeckSize
+  RelicDeckSize,
+  ExileCitizenStatusPrev,
+  WinningColor
 }
 
 const Indices: Record<SavefileDataType, (offset: number) => ({ start: number, end: number })> = {
@@ -70,7 +72,10 @@ const Indices: Record<SavefileDataType, (offset: number) => ({ start: number, en
 
   // offset dynamically set to dispossessed deck size between these places
 
-  [SavefileDataType.RelicDeckSize]:           (offset: number) => ({ start: offset + 0,   end: offset + 2 })
+  [SavefileDataType.RelicDeckSize]:           (offset: number) => ({ start: offset + 0,   end: offset + 2 }),
+  [SavefileDataType.ExileCitizenStatusPrev]:  (offset: number) => ({ start: offset + 2,   end: offset + 4 }),
+  [SavefileDataType.WinningColor]:            (offset: number) => ({ start: offset + 4,   end: offset + 6 }),
+
 };
 
 function parseCitizenshipByte(byte: number): Record<PlayerColor, Citizenship> {  
@@ -89,6 +94,16 @@ function parseCitizenshipByte(byte: number): Record<PlayerColor, Citizenship> {
   if(byte & 0x01) citizenships[PlayerColor.Red] = Citizenship.Citizen;
 
   return citizenships;
+}
+
+function parseColorByte(byte: number): PlayerColor {  
+  if(byte & 0x10) return PlayerColor.Brown;
+  if(byte & 0x08) return PlayerColor.Yellow;
+  if(byte & 0x04) return PlayerColor.White;
+  if(byte & 0x02) return PlayerColor.Blue;
+  if(byte & 0x01) return PlayerColor.Red;
+
+  return PlayerColor.Unknown;
 }
 
 export function parseOathTTSSavefileString(saveDataString: string): OathGame {
@@ -250,9 +265,23 @@ export function parseOathTTSSavefileString(saveDataString: string): OathGame {
     
     updateOffset(relicEnd + (2 * numRelics));
   };
+  
+  // 3.1.1 adds previous citizenship and winner color
+  const parseData_3_1_1 = () => {
+    if(oathMajor < 3 || oathMinor < 1 || oathPatch < 1) return;
+    console.log(oathMajor, oathMinor, oathPatch)
+
+    // load citizenship
+    const prevExileCitizenStatusByte = getHexByIndex(SavefileDataType.ExileCitizenStatusPrev);
+    game.prevPlayerCitizenship = parseCitizenshipByte(prevExileCitizenStatusByte);
+    
+    const winnerColor = parseColorByte(SavefileDataType.WinningColor);
+    game.winner = winnerColor;
+  };
 
   parseData_1_6_0();
   parseData_3_1_0();
+  parseData_3_1_1();
 
   return game as OathGame;
 };

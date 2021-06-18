@@ -28,4 +28,7 @@ export interface OathGame {
   world: Card[];
   dispossessed: Card[];
   relics: Card[];
+
+  prevPlayerCitizenship: Record<PlayerColor, Citizenship>;
+  winner: PlayerColor;
 }

@@ -102,8 +102,6 @@ function parseColorByte(byte: number): PlayerColor {
   if(byte & 0x04) return PlayerColor.White;
   if(byte & 0x02) return PlayerColor.Blue;
   if(byte & 0x01) return PlayerColor.Red;
-
-  return PlayerColor.Unknown;
 }
 
 export function parseOathTTSSavefileString(saveDataString: string): OathGame {

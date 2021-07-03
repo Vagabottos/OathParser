@@ -1,5 +1,10 @@
-
-import { Citizenship, PlayerColor, Suit } from './enums';
+import {
+  Citizenship,
+  PlayerColor,
+  PlayerCitizenship,
+  Suit,
+  Oath,
+} from './enums';
 
 export interface Card {
   name: string;
@@ -21,7 +26,7 @@ export interface OathGame {
   gameCount: number;
   chronicleName: string;
 
-  playerCitizenship: Record<PlayerColor, Citizenship>;
+  playerCitizenship: PlayerCitizenship;
   oath: string;
   suitOrder: Suit[];
   sites: Site[];
@@ -29,6 +34,6 @@ export interface OathGame {
   dispossessed: Card[];
   relics: Card[];
 
-  prevPlayerCitizenship: Record<PlayerColor, Citizenship>;
+  prevPlayerCitizenship: PlayerCitizenship;
   winner: PlayerColor;
 }

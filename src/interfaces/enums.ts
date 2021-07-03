@@ -17,6 +17,7 @@ export enum Oath {
 }
 
 export enum PlayerColor {
+  Purple = 'Purple',
   Brown = 'Brown',
   Yellow = 'Yellow',
   White = 'White',
@@ -28,3 +29,8 @@ export enum Citizenship {
   Exile = 'Exile',
   Citizen = 'Citizen'
 }
+
+export type PlayerCitizenship = Omit<
+  Record<PlayerColor, Citizenship>,
+  PlayerColor.Purple
+>;

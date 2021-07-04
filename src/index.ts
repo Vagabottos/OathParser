@@ -1,5 +1,17 @@
 
-import { CardNameIndexes, Citizenship, Oath, OathGame, PlayerColor, SiteNameIndexes } from './interfaces';
+import {
+  Card,
+  CardName,
+  CardNameIndexes,
+  Citizenship,
+  Oath,
+  OathGame,
+  PlayerColor,
+  PlayerCitizenship,
+  SiteName,
+  SiteNameIndexes,
+  Suit,
+} from './interfaces';
 
 const CHRONICLE_NAME_MIN_LENGTH = 1;
 const CHRONICLE_NAME_MAX_LENGTH = 255;
@@ -13,12 +25,7 @@ enum SavefileDataType {
   PlayerStatus,
   ExileCitizenStatus,
   Oath,
-  SuitDiscord,
-  SuitHearth,
-  SuitNomad,
-  SuitArcane,
   SuitOrder,
-  SuitBeast,
   Site1,
   Site2,
   Site3,
@@ -48,14 +55,7 @@ const Indices: Record<SavefileDataType, (offset: number) => ({ start: number, en
   [SavefileDataType.ExileCitizenStatus]:      (offset: number) => ({ start: offset + 2,   end: offset + 4 }),
 
   [SavefileDataType.Oath]:                    (offset: number) => ({ start: offset + 4,   end: offset + 6 }),
-
-  [SavefileDataType.SuitDiscord]:             (offset: number) => ({ start: offset + 6,   end: offset + 7 }),
-  [SavefileDataType.SuitHearth]:              (offset: number) => ({ start: offset + 7,   end: offset + 8 }),
-  [SavefileDataType.SuitNomad]:               (offset: number) => ({ start: offset + 8,   end: offset + 9 }),
-  [SavefileDataType.SuitArcane]:              (offset: number) => ({ start: offset + 9,   end: offset + 10 }),
-  [SavefileDataType.SuitOrder]:               (offset: number) => ({ start: offset + 10,  end: offset + 11 }),
-  [SavefileDataType.SuitBeast]:               (offset: number) => ({ start: offset + 11,  end: offset + 12 }),
-
+  [SavefileDataType.SuitOrder]:               (offset: number) => ({ start: offset + 6,   end: offset + 12 }),
   [SavefileDataType.Site1]:                   (offset: number) => ({ start: offset + 12,  end: offset + 14 }),
   [SavefileDataType.Site2]:                   (offset: number) => ({ start: offset + 20,  end: offset + 22 }),
   [SavefileDataType.Site3]:                   (offset: number) => ({ start: offset + 28,  end: offset + 30 }),
@@ -73,39 +73,166 @@ const Indices: Record<SavefileDataType, (offset: number) => ({ start: number, en
   // offset dynamically set to dispossessed deck size between these places
 
   [SavefileDataType.RelicDeckSize]:           (offset: number) => ({ start: offset + 0,   end: offset + 2 }),
-  [SavefileDataType.ExileCitizenStatusPrev]:  (offset: number) => ({ start: offset + 2,   end: offset + 4 }),
-  [SavefileDataType.WinningColor]:            (offset: number) => ({ start: offset + 4,   end: offset + 6 }),
 
+  [SavefileDataType.ExileCitizenStatusPrev]:  (offset: number) => ({ start: offset + 0,   end: offset + 2 }),
+  [SavefileDataType.WinningColor]:            (offset: number) => ({ start: offset + 2,   end: offset + 4 }),
 };
 
-function parseCitizenshipByte(byte: number): Record<PlayerColor, Citizenship> {  
-  const citizenships: Record<PlayerColor, Citizenship> = {
+function parseCitizenshipByte(byte: number): PlayerCitizenship {
+  const citizenships: PlayerCitizenship = {
     [PlayerColor.Brown]:  Citizenship.Exile,
     [PlayerColor.Yellow]: Citizenship.Exile,
     [PlayerColor.White]:  Citizenship.Exile,
     [PlayerColor.Blue]:   Citizenship.Exile,
     [PlayerColor.Red]:    Citizenship.Exile
   };
-
-  if(byte & 0x10) citizenships[PlayerColor.Brown] = Citizenship.Citizen;
-  if(byte & 0x08) citizenships[PlayerColor.Yellow] = Citizenship.Citizen;
-  if(byte & 0x04) citizenships[PlayerColor.White] = Citizenship.Citizen;
-  if(byte & 0x02) citizenships[PlayerColor.Blue] = Citizenship.Citizen;
-  if(byte & 0x01) citizenships[PlayerColor.Red] = Citizenship.Citizen;
+  if(byte & colorMask(PlayerColor.Brown)) citizenships[PlayerColor.Brown] = Citizenship.Citizen;
+  if(byte & colorMask(PlayerColor.Yellow)) citizenships[PlayerColor.Yellow] = Citizenship.Citizen;
+  if(byte & colorMask(PlayerColor.White)) citizenships[PlayerColor.White] = Citizenship.Citizen;
+  if(byte & colorMask(PlayerColor.Blue)) citizenships[PlayerColor.Blue] = Citizenship.Citizen;
+  if(byte & colorMask(PlayerColor.Red)) citizenships[PlayerColor.Red] = Citizenship.Citizen;
 
   return citizenships;
 }
 
-function parseColorByte(byte: number): PlayerColor {  
-  if(byte & 0x10) return PlayerColor.Brown;
-  if(byte & 0x08) return PlayerColor.Yellow;
-  if(byte & 0x04) return PlayerColor.White;
-  if(byte & 0x02) return PlayerColor.Blue;
-  if(byte & 0x01) return PlayerColor.Red;
+function parseColorByte(byte: number): PlayerColor {
+  if(byte & colorMask(PlayerColor.Purple)) return PlayerColor.Purple;
+  if(byte & colorMask(PlayerColor.Brown)) return PlayerColor.Brown;
+  if(byte & colorMask(PlayerColor.Yellow)) return PlayerColor.Yellow;
+  if(byte & colorMask(PlayerColor.White)) return PlayerColor.White;
+  if(byte & colorMask(PlayerColor.Blue)) return PlayerColor.Blue;
+  if(byte & colorMask(PlayerColor.Red)) return PlayerColor.Red;
+}
+
+function colorMask(color: PlayerColor): number {
+  return {
+    [PlayerColor.Purple]: 0x20,
+    [PlayerColor.Brown]: 0x10,
+    [PlayerColor.Yellow]: 0x08,
+    [PlayerColor.White]: 0x04,
+    [PlayerColor.Blue]: 0x02,
+    [PlayerColor.Red]: 0x01
+  }[color];
+}
+
+function genCitizenshipByte(citizenship: PlayerCitizenship): number {
+  let byte = 0x00;
+  if(citizenship.Brown === Citizenship.Citizen) byte |= colorMask(PlayerColor.Brown);
+  if(citizenship.Yellow === Citizenship.Citizen) byte |= colorMask(PlayerColor.Yellow);
+  if(citizenship.White === Citizenship.Citizen) byte |= colorMask(PlayerColor.White);
+  if(citizenship.Blue === Citizenship.Citizen) byte |= colorMask(PlayerColor.Blue);
+  if(citizenship.Red === Citizenship.Citizen) byte |= colorMask(PlayerColor.Red);
+  return byte;
+}
+
+// Serialize `num` into a hex string `width` chars wide.
+//
+// The result is 0-padded and matches the format of the TTS hex encodings
+// (uppercase).
+function hex(num: number, width: number): string {
+  const str = num.toString(16).padStart(width, '0').toUpperCase();
+  if (str.length > width) {
+    throw new Error(
+      `number ${num} is wider than ${width} when encoded: ${str}`
+    );
+  }
+  return str;
+}
+
+// Serialize a deck into its hex-encoded savefile format.
+//
+// The first byte is the size of the deck, and each subsequent byte is the id of
+// a card in the deck, in order.
+function serializeDeck(deck: Card[]): string {
+  let bytes = [deck.length, ...deck.map((card) => CardName[card.name])];
+  return bytes.map((byte) => hex(byte, 2)).join('');
+}
+
+// Serialize a structured `OathGame` into a save file string.
+//
+// Inverse of `parseOathTTSSavefileString`.
+export function serializeOathGame(game: OathGame): string {
+  const oathMajor = parseInt(game.version.major, 10);
+  const oathMinor = parseInt(game.version.minor, 10);
+  const oathPatch = parseInt(game.version.minor, 10);
+
+  if (oathMajor < 3 || (oathMajor === 3 && oathMinor < 1)) {
+    throw new Error('Oath savefile version 3.1.0 is the minimum required.');
+  }
+
+  // See `basicDataString` in lua mod for format.
+  const basicData: string[] = [
+    hex(oathMajor, 2),
+    hex(oathMinor, 2),
+    hex(oathPatch, 2),
+    hex(game.gameCount, 4),
+    hex(game.chronicleName.length, 2),
+    game.chronicleName,
+
+    // TODO: in >= 3.3.2, this empty byte is replaced with the active player
+    // status. This needs to be added to `OathGame` and the parser and then
+    // added here.
+    hex(0, 2), // empty byte
+
+    hex(genCitizenshipByte(game.playerCitizenship), 2),
+    hex(Oath[game.oath], 2),
+    ...game.suitOrder.map((suit) => hex(suit, 1)),
+  ];
+
+
+  // See `mapDataString` in lua mod for format.
+  const mapData: string[] = game.sites.map((site) => {
+    const siteId = SiteName[site.name];
+    const bytes: number[] = [siteId];
+    if (site.ruined && siteId !== SiteName.NONE) {
+      bytes[0] += 24;
+    }
+    site.cards.forEach((card) => {
+      bytes.push(CardName[card.name]);
+    });
+    return bytes.map((byte) => hex(byte, 2)).join('');
+  });
+
+  const worldDeck: string = serializeDeck(game.world);
+  const dispossessedDeck: string = serializeDeck(game.dispossessed);
+  const relicDeck: string = serializeDeck(game.relics);
+
+  let chunks = [
+    ...basicData,
+    ...mapData,
+    worldDeck,
+    dispossessedDeck,
+    relicDeck,
+  ];
+
+  // Add previous game data if >= 3.3.1
+  (() => {
+    // TODO: should use a semver package for version checks.
+    if (oathMajor < 3) return;
+    if (oathMajor === 3) {
+      if (oathMinor < 3) return;
+      if (oathMinor === 3) {
+        if (oathPatch < 1) return;
+      }
+    }
+
+    // See `previousGameInfoString` in lua mod for format.
+    // TODO: `OathGame` doesn't yet hold the previous winner's name,
+    // so use the default from the lua mod.
+    const winnerSteamName = "UNKNOWN";
+    const previousGameData: string[] = [
+      hex(genCitizenshipByte(game.prevPlayerCitizenship), 2),
+      hex(colorMask(game.winner), 2),
+      hex(winnerSteamName.length, 2),
+      winnerSteamName,
+    ];
+    chunks = [...chunks, ...previousGameData];
+  })();
+
+  return chunks.join('');
 }
 
 export function parseOathTTSSavefileString(saveDataString: string): OathGame {
-
   let parseOffsetForName = 0;
 
   function getHexFromStringAsNumber(startIndex: number, endIndex: number): number {
@@ -143,7 +270,7 @@ export function parseOathTTSSavefileString(saveDataString: string): OathGame {
     minor: oathMinor.toString(), 
     patch: oathPatch.toString() 
   };
-    
+
   if(oathMajor < 3 && oathMinor < 1) {
     throw new Error('Oath savefile version 3.1.0 is the minimum required.');
   }
@@ -181,22 +308,14 @@ export function parseOathTTSSavefileString(saveDataString: string): OathGame {
     game.oath = Oath[getHexByIndex(SavefileDataType.Oath)];
     if(!game.oath) throw new Error('Invalid Oath value was found while parsing the savefile.');
 
-    // make sure all suit codes are found
-    game.suitOrder = [
-      SavefileDataType.SuitDiscord,
-      SavefileDataType.SuitHearth,
-      SavefileDataType.SuitNomad,
-      SavefileDataType.SuitArcane,
-      SavefileDataType.SuitOrder,
-      SavefileDataType.SuitBeast
-    ]
-    .map(suitSlot => {
-      return { suit: SavefileDataType[suitSlot].split('Suit')[1], order: getHexByIndex(suitSlot) }
-    })
-    .reduce((prev, cur) => {
-      prev[cur.order] = cur.suit;
-      return prev;
-    }, []);
+    // Load suit order. This is unused in retail Oath but still
+    // part of the save file format.
+    game.suitOrder = [];
+    const { start: suitOrderStart, end: suitOrderEnd } = getStartEndByIndex(SavefileDataType.SuitOrder);
+    for (let i = suitOrderStart; i < suitOrderEnd; i++) {
+      let suit = getHexFromStringAsNumber(i, i + 1);
+      game.suitOrder.push(suit);
+    }
 
     // load sites
     game.sites = [
@@ -273,7 +392,7 @@ export function parseOathTTSSavefileString(saveDataString: string): OathGame {
     const prevExileCitizenStatusByte = getHexByIndex(SavefileDataType.ExileCitizenStatusPrev);
     game.prevPlayerCitizenship = parseCitizenshipByte(prevExileCitizenStatusByte);
     
-    const winnerColor = parseColorByte(SavefileDataType.WinningColor);
+    const winnerColor = parseColorByte(getHexByIndex(SavefileDataType.WinningColor));
     game.winner = winnerColor;
   };
 

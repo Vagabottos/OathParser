@@ -154,7 +154,7 @@ function serializeDeck(deck: Card[]): string {
 export function serializeOathGame(game: OathGame): string {
   const oathMajor = parseInt(game.version.major, 10);
   const oathMinor = parseInt(game.version.minor, 10);
-  const oathPatch = parseInt(game.version.minor, 10);
+  const oathPatch = parseInt(game.version.patch, 10);
 
   if (oathMajor < 3 || (oathMajor === 3 && oathMinor < 1)) {
     throw new Error('Oath savefile version 3.1.0 is the minimum required.');
